@@ -1,6 +1,7 @@
 const express = require('express');
 
-const hbs = require('hbs');
+const Movies = require('./models/movie.model');
+require("./configs/database.config");
 
 require('dotenv').config();
 
@@ -27,8 +28,15 @@ app.get('/store/clothes/:season/:singleClothing', (req, res) => {
 });
 
 // Query strings form results
-app.get('/store/search', (req, res) => {
-  res.render('results-page', req.query);
+app.get("/store/search", (req, res) => {
+  const searchString = req.query.search;
+
+  Movies.find({ title: { $regex: searchString, $options: "i" } }).then(
+    (response) => {
+      console.log(">>>>>>>", searchString, response);
+      res.render("results-page", { movies: response });
+    }
+  );
 });
 
 // Shop index page
